@@ -1,14 +1,68 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const NewList = () => {
+   
+
+      const [myList, setMylist] = useState([]);
+    
+ 
+ 
+ 
+      const getList = async ()=>{
+
+    
+        await fetch("https://assets.breatheco.de/apis/fake/todos/user/santiagoss", {
+          method: "GET",
+        })
+          .then((response) => {
+            return response.json();
+          })
+          .then((data) => {
+            setMylist(data);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      };
+
+    useEffect (()=>{   
+        getList()
+   }, []); 
+
+   
+   
+   const putList = async ()=>{
+
+    
+    await fetch("https://assets.breatheco.de/apis/fake/todos/user/santiagoss", {
+      method: "PUT",
+      body: JSON.stringify(myList),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+      .catch((error) => console.error("error", error));
+  };
+
+    console.log(myList);
+
     const [myinput, setMyinput] = useState("");
 
-    const [myList, setMylist] = useState(["Reading", "Cooking", "dancing alone", "Cat food"]);
+    useEffect (()=>{   
+        putList();
+   }, [myList]); 
+
+
+  
 
     const submitHandler = (e) => {
+       
         e.preventDefault();
         setMyinput("");
-        setMylist([myinput, ...myList]);
+        setMylist([{label: myinput, done: false}, ...myList]);
+       
 
     };
 
@@ -21,7 +75,7 @@ const NewList = () => {
             return index !== id;
         }))
     };
-    const [applyStyle, setApplystyle] = useState("");
+  
      
     const[completedTodo, setCompletedtodo] = useState([]);
 
@@ -49,17 +103,17 @@ const NewList = () => {
                 <ul className="list-group">
                     {myList.map((listElement, index) => {
                         return <li key={index} className= {`list-group-item d-flex  justify-content-between hidden-icon myStyledlist ${completedTodo.includes(index)? " red":""} ${imporTanttodo.includes(index)? " important":""}`} >
-                            {listElement}
+                            {listElement.label}
                             <span className="d-flex justify-content-around">
                                 
-                                <a id="trash" key={index}  onClick={(e) => { removeFromlist(index) }}>
+                                <a id="trash"   onClick={(e) => { removeFromlist(index) }}>
                                     <i className={"fas fa-trash selected "}></i>
                                 </a>
-                                <a id="select" key={index} onClick={(e) =>{taskCompleted(index)}}>
+                                <a id="select"  onClick={(e) =>{taskCompleted(index)}}>
                                     <i className={"fas fa-check selected "}></i>
                                 </a>
                             
-                                <a id="check" key={index} onClick={(e) =>{importantTask(index)}}>
+                                <a id="check"  onClick={(e) =>{importantTask(index)}}>
                                     <i className={"fas fa-exclamation selected "}></i>
                                 </a>
                                 
@@ -73,9 +127,11 @@ const NewList = () => {
                 {myList.length ? "" : <span id="warning"> Add a new task!</span>}
             </div>
         </div>
+       
 
     );
 
 };
+
 
 export default NewList;
